@@ -1,0 +1,344 @@
+#include<string.h> 
+#include <WiFiClientSecure.h> // Include the HTTPS library 
+#include "Arduino.h" 
+#include <EMailSender.h> 
+ 
+ 
+ 
+ 
+#define BLYNK_TEMPLATE_ID "TMPL390hXLvCC" 
+#define BLYNK_TEMPLATE_NAME "HOME AUTOMATION" 
+#define BLYNK_AUTH_TOKEN 
+"9b2VKbkFYoafDZgxTmTEcpoBANUs3mjo" 
+ 
+ 
+/* 
+#define BLYNK_TEMPLATE_ID "TMPL3aXWPJo1Z" 
+#define BLYNK_TEMPLATE_NAME "IOT PROJECT" 
+#define BLYNK_AUTH_TOKEN 
+"reRdpaDxKpk4BeRwsuFdWPdCUHK4LqFu" 
+*/ 
+ 
+ 
+ 
+ 
+ 
+ 
+int val=0; int val1=0; int force=16; int 
+l1=26;//25 int l2=25;//26 int l3=33;//32 int pp=32;//33 
+#define BLYNK_PRINT Serial 
+ 
+ 
+ 
+ 
+ 
+ 
+#if defined(ESP8266) 
+#include <ESP8266WiFi.h> 
+#include <BlynkSimpleEsp8266.h> 
+#include <WiFiClientSecure.h> // Include the HTTPS library 
+	#include <ESP8266WiFi.h> 	// Include the Wi-Fi library 
+#include <ESP8266WiFiMulti.h> // Include the Wi-Fi-Multi library 
+	ESP8266WiFiMulti wifiMulti; 	// Create an instance of the 
+ESP8266WiFiMulti class, called 'wifiMulti' 
+#elif defined(ESP32) 
+#include <WiFi.h> 
+#include <WiFiClient.h> 
+#include <BlynkSimpleEsp32.h> 
+#include <WiFiMulti.h> 
+WiFiMulti wifiMulti; // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti' 
+#endif 
+char auth[] = BLYNK_AUTH_TOKEN; 
+ 
+ 
+// Your WiFi credentials. 
+// Set password to "" for open networks. 
+char ssid[] = "ZTE-sUQdqa"; 
+char pass[] = "5hjgxyh9"; 
+ 
+ 
+ 
+ 
+ 
+ 
+uint8_t connection_state = 0; uint16_t reconnect_interval = 10000; 
+WiFiClient client; 
+String data1=""; 
+String data2="cmd"; String data=" MESSAGE"; 
+float latitude=18.068934633390842; //18.068934633390842, 
+78.85471331292823 
+float logitude=78.85471331292823; //78.38541332339298 
+ 
+ 
+String location=" 
+http://maps.google.com/maps?&z=15&mrt=yp&t=k&q="+String(latitude,6)+"+ "+String(logitude,6); 
+ 
+ 
+BlynkTimer timer; 
+// This function sends Arduino's up time every second to Virtual Pin (5). // In the app, Widget's reading frequency should be set to PUSH. This means 
+// that you define how often to send data to Blynk App. 
+ 
+ 
+EMailSender emailSend("sivaprasadpilla7@gmail.com", "tvgcjlhvnpdetvvq"); void gmail() 
+{ 
+EMailSender::EMailMessage message; 
+ 
+ 
+message.subject = "MAIL FROM IOT MODULE: : "+data1; message.message = "MAIL FROM IOT MODULE: : "+data1; 
+ 
+EMailSender::Response resp = emailSend.send("siva9014475682@gmail.com", message); 
+ 
+ 
+Serial.println("Sending status: "); 
+ 
+ 
+Serial.println(resp.status); 
+Serial.println(resp.code); 
+Serial.println(resp.desc); 
+} 
+ 
+
+void upload() 
+{ 
+const char* server4 = "api.thingspeak.com"; const char* _getLink4 = 
+"https://api.thingspeak.com/update?api_key=PWX6Z0ZH2CQXFG3X&field1= "; // Thingspeak.com 
+//const char* _getLink4 = 
+"https://api.thingspeak.com/update?api_key=8QEMT0G004GKO1L8&field1="; 
+// Thingspeak.com 
+ 
+ 
+// Serial.println("data uploading");delay(1000); client.connect(server4,80); 
+	if (client.connect(server4,80)) 	// "184.106.153.149" or api.thingspeak.com 
+https://api.thingspeak.com/apps/thinghttp/send_request?api_key=CT9B331KB5 
+PLM1G5 
+{ 
+String getStr4 = _getLink4; client.print("GET "+getStr4+data1+"\n"); client.print("HTTP/1.1\n"); 
+client.print("Host: api.thingspeak.com\n"); client.print("Connection: close\n\n\n"); 
+} client.stop(); } 
+ 
+ 
+void myTimerEvent() 
+{ back: while(Serial.available()) 
+{ data1=Serial.readString(); 
+Blynk.virtualWrite(V5,data1);delay(1000); 
+Blynk.virtualWrite(V6,data1);delay(1000); 
+Blynk.virtualWrite(V7,data1);delay(1000); 
+Blynk.virtualWrite(V8,data1);delay(1000); 
+Blynk.virtualWrite(V11,data1);delay(1000); 
+//data1.replace(" ","_");delay(1000); 
+//data1.replace(":","_");delay(1000); 
+//upload();delay(1000); 
+//data1=data1+location;delay(1000); 
+//gmail();delay(1000); 
+/* if (Serial.available() > 0) { // Read the data from Arduino 
+String dataFromArduino = Serial.readStringUntil('\n'); 
+ 
+ 
+int sensor1Value, sensor2Value, sensor3Value, sensor4Value; 
+// Parse and extract individual sensor values 
+sscanf(dataFromArduino.c_str(), "Sensor1: %d, Sensor2: %d, Sensor3: %d", 
+&sensor1Value, &sensor2Value, &sensor3Value); 
+ 
+ 
+Serial.print("Sensor1: "); 
+Serial.print(sensor1Value); 
+Serial.print(", Sensor2: "); 
+Serial.print(sensor2Value); 
+Serial.print(", Sensor3: "); 
+Serial.println(sensor3Value); 
+Blynk.virtualWrite(V4,"\r\nsensor1Value:");Blynk.virtualWrite(V4,sensor1Valu e); 
+Blynk.virtualWrite(V4,"\r\nsensor2Value:");Blynk.virtualWrite(V4,sensor2Valu e); 
+Blynk.virtualWrite(V4,"\r\nsensor3:Value");Blynk.virtualWrite(V4,sensor3Valu e); } 
+*/ 
+} 
+ 
+ 
+BLYNK_WRITE(V0) 
+{ int pinValue = param.asInt(); // assigning incoming value from pin V1 to a 
+variable 
+//Serial.print("VALUE V0:");//Serial.println(String(pinValue)); if(pinValue==0) 
+{ 
+Serial.print("1");delay(100); 
+Blynk.virtualWrite(V4, "Load:1 On\r\n"); digitalWrite(l1,LOW);delay(1000); 
+} if(pinValue==1) 
+{ 
+Serial.print("2");delay(100); 
+Blynk.virtualWrite(V4, "Load:1 Off\r\n"); digitalWrite(l1,HIGH);delay(1000); 
+ 
+ 
+ 
+} 
+} 
+ 
+ 
+BLYNK_WRITE(V1) 
+{ int pinValue = param.asInt(); // assigning incoming value from pin V1 to a 
+variable 
+} 
+ 
+ 
+BLYNK_WRITE(V0) 
+{ int pinValue = param.asInt(); // assigning incoming value from pin V1 to a 
+variable 
+//Serial.print("VALUE V0:");//Serial.println(String(pinValue)); if(pinValue==0) 
+{ 
+Serial.print("1");delay(100); 
+Blynk.virtualWrite(V4, "Load:1 On\r\n"); digitalWrite(l1,LOW);delay(1000); 
+} if(pinValue==1) 
+{ 
+Serial.print("2");delay(100); 
+Blynk.virtualWrite(V4, "Load:1 Off\r\n"); digitalWrite(l1,HIGH);delay(1000); 
+ 
+ 
+ 
+} 
+} 
+ 
+ 
+BLYNK_WRITE(V1) 
+{ int pinValue = param.asInt(); // assigning incoming value from pin V1 to a 
+variable 
+{ 
+Serial.print("5");delay(100); 
+Blynk.virtualWrite(V4, "Load:3 On\r\n"); digitalWrite(l3,LOW);delay(1000); 
+ 
+} if(pinValue==1) 
+{ 
+Serial.print("6");delay(100); 
+Blynk.virtualWrite(V4, "Load:3 Off\r\n"); digitalWrite(l3,HIGH);delay(1000); 
+ 
+} 
+} 
+ 
+ 
+BLYNK_WRITE(V3) 
+{ int pinValue = param.asInt(); // assigning incoming value from pin V1 to a 
+variable 
+//Serial.print("VALUE V3:");Serial.println(String(pinValue)); if(pinValue==0) 
+{ 
+Serial.print("7");delay(100); 
+Blynk.virtualWrite(V4, "Load:4 On\r\n"); digitalWrite(pp,LOW);delay(1000); 
+ 
+ 
+} if(pinValue==1) 
+{ 
+Serial.print("8");delay(100); 
+Blynk.virtualWrite(V4, "Load:4 Off \r\n"); digitalWrite(pp,HIGH);delay(1000); 
+ 
+} 
+ 
+ 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+BLYNK_WRITE(V11) 
+{ int pinValue = int(param.asInt()); // assigning incoming value from pin V1 to a 
+variable 
+Serial.print("DATA FROM TERMINAL:");Serial.println(pinValue); 
+//Blynk.virtualWrite(V4,"DATA FROM TERMINAL:");Blynk.virtualWrite(V4,pinValue); if(pinValue==12345) 
+{ 
+Serial.println("CORRCET PASSWORD LOCKER OPEN");delay(1000); Blynk.virtualWrite(V4,"LOCKER OPEN"); 
+} 
+else if(pinValue==54321) 
+{ 
+Serial.println("CORRCET PASSWORD LOCKER CLOSE");delay(1000); 
+Blynk.virtualWrite(V4,"LOCKER CLOSE"); 
+} 
+} 
+ 
+ 
+/*#include <SimpleDHT.h> int pinDHT11 =13; 
+SimpleDHT11 dht11(pinDHT11); 
+*/ 
+ 
+ 
+ 
+ 
+ 
+ 
+void senddata1() 
+{ 
+/* byte temperature = 0; byte humidity = 0; int err = SimpleDHTErrSuccess; 
+if ((err = dht11.read(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess) 
+{ 
+// Serial.print("Read DHT11 failed, err="); 
+Serial.print(SimpleDHTErrCode(err)); 
+// Serial.print(","); Serial.println(SimpleDHTErrDuration(err)); delay(1000); return; 
+} 
+ 
+ 
+int temp=((int)temperature); 
+Serial.println("CORRCET PASSWORD LOCKER CLOSE");delay(1000); 
+Blynk.virtualWrite(V4,"LOCKER CLOSE"); 
+} 
+} 
+ 
+ 
+/*#include <SimpleDHT.h> int pinDHT11 =13; 
+SimpleDHT11 dht11(pinDHT11); 
+*/ 
+ 
+ 
+ 
+ 
+ 
+ 
+void senddata1() 
+{ 
+/* byte temperature = 0; byte humidity = 0; int err = SimpleDHTErrSuccess; 
+if ((err = dht11.read(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess) 
+{ 
+// Serial.print("Read DHT11 failed, err="); 
+Serial.print(SimpleDHTErrCode(err)); 
+// Serial.print(","); Serial.println(SimpleDHTErrDuration(err)); delay(1000); return; 
+} 
+ 
+ 
+int temp=((int)temperature); 
+void setup() 
+{ 
+pinMode(force,INPUT); 
+ 
+ 
+pinMode(l1,OUTPUT);pinMode(l2,OUTPUT);pinMode(l3,OUTPUT);pinMode (pp,OUTPUT); 
+ 
+digitalWrite(l1,HIGH);digitalWrite(l2,HIGH);digitalWrite(l3,HIGH);digitalWrit e(pp,HIGH); 
+// Debug console 
+Serial.begin(9600); wifiMulti.addAP("consciencetechnologies", "484conscience777");  // add Wi- 
+Fi networks you want to connect to wifiMulti.addAP("sivaji", "sivaji.123"); wifiMulti.addAP("ZTE-sUQdqa", "5hjgxyh9"); wifiMulti.addAP("project", "project.123"); wifiMulti.addAP("123456789", "123456789"); 
+ 
+//Serial.println("Connecting ..."); 
+ 
+ 
+while (wifiMulti.run() != WL_CONNECTED) { // Wait for the Wi-Fi to 
+connect: scan for Wi-Fi networks, and connect to the strongest of the networks above delay(250); 
+Serial.print('.'); } 
+Serial.println('\n'); 
+Serial.print("Connected to "); 
+Serial.println(WiFi.SSID()); 
+Serial.print("IP address:\t"); 
+ 	// Tell us what network we're connected to 
+//Serial.println(WiFi.localIP()); 	// Send the IP address of the ESP8266 to 
+the computer 
+//Serial.println('\n'); 
+Blynk.begin(auth, ssid, pass);delay(1000); // You can also specify server: 
+//Blynk.begin(auth, ssid, pass, "blynk.cloud", 80); 
+//Blynk.begin(auth, ssid, pass, IPAddress(192,168,1,100), 8080); timer.setInterval(1000L, myTimerEvent); 
+//timer.setInterval(500L, senddata1); 
+} 
+ 
+ 
+void loop() 
+{ 
+ 
+ 
+Blynk.run(); timer.run(); 
+// You can inject your own code or combine it with other sketches. // Check other examples on how to communicate with Blynk. Remember // to avoid delay() function! 
+}  
+
+
